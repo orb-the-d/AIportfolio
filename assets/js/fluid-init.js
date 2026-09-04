@@ -21,15 +21,18 @@
     IMMEDIATE: false,        // stay blank until the visitor actually moves their mouse
     SIM_RESOLUTION: 128,
     DYE_RESOLUTION: 1024,
-    DENSITY_DISSIPATION: 2.2,  // trail fades a bit sooner — keeps color from pooling into neon patches
-    VELOCITY_DISSIPATION: 2.0,
-    PRESSURE: 0.8,
-    CURL: 14,                 // less curl = softer, less tightly-wound swirls
-    SPLAT_RADIUS: 0.45,       // bigger, softer splats blend into each other like ink/paint in water
-    SPLAT_FORCE: 3200,        // gentler force so colors diffuse instead of punching in bright
+    DENSITY_DISSIPATION: 3.2,  // fades out within a couple seconds — stops old splats from
+                               // piling on top of new ones and washing the whole thing out to white
+    VELOCITY_DISSIPATION: 2.4, // more resistance to motion = heavier, thicker liquid, not floaty air
+    PRESSURE: 0.92,            // closer to incompressible = behaves like a real liquid, not gas
+    CURL: 5,                   // low curl = a few big calm swirls, not lots of small chaotic
+                                // wisps — this is the main "air vs water" knob
+    SPLAT_RADIUS: 0.36,        // a drop spreading into water, not an overlapping smear
+    SPLAT_FORCE: 3600,
     SHADING: false,           // flat color, no fake 3D lighting — that lighting was the harsh neon-glow look
     COLORFUL: true,
-    COLOR_UPDATE_SPEED: 3,    // slower hue drift = smooth pastel blending, not fast rainbow flashing
+    COLOR_UPDATE_SPEED: 1.6,  // slow, gradual hue drift like dye actually diffusing — not a
+                               // fast rainbow flicker, which reads as "air" rather than liquid
     TRANSPARENT: true,
     BLOOM: false,             // bloom was the main source of the too-bright glow — off
     SUNRAYS: false,
