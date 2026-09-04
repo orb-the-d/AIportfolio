@@ -1,0 +1,75 @@
+{
+  "profile": {
+    "name": "Djamal Eddine",
+    "age": 23,
+    "tagline": "I build and secure systems — from bank IT fleets to connected devices.",
+    "kicker": "SOFTWARE DEV · CYBERSECURITY · IOT",
+    "lead": "CS graduate, CompTIA Security+ and Cisco Ethical Hacker certified, now doing a Master's in IoT at the University of Salerno, Italy."
+  },
+
+  "heroFacts": [
+    { "emoji": "🎓", "label": "MSc IoT", "detail": "Univ. of Salerno" },
+    { "emoji": "🛡️", "label": "Security+", "detail": "certified" },
+    { "emoji": "🏦", "label": "Bank of Algeria", "detail": "built their DPI asset tracking platform" }
+  ],
+
+  "projects": [
+    {
+      "org": "Bank of Algeria — DPI Department",
+      "title": "IT Asset Management & Tracking System",
+      "description": "Built as Djamal's final-year project (PFE) for his Bachelor's, with the Bank of Algeria's DPI (IT department). Replaced a fully manual, paper-based workflow for tracking IT equipment with a secure web platform covering the full asset lifecycle, automated incident ticketing, and real-time dashboards for the team managing the bank's IT equipment fleet.",
+      "tags": ["React", "Node.js", "Express", "PostgreSQL", "Prisma", "Docker"],
+      "note": ""
+    },
+    {
+      "org": "University of Salerno — MSc IoT",
+      "title": "Master's coursework & research projects",
+      "description": "Currently building applied projects around IoT systems and security as part of the Master's track — connected devices, network security, and embedded systems.",
+      "tags": ["IoT", "network security", "in progress"],
+      "note": "Specific coursework and lab projects will be added here as the Master's program progresses."
+    }
+  ],
+
+  "skills": {
+    "Software Development": [
+      "React — built the Bank of Algeria platform's frontend",
+      "Node.js / Express — REST API and backend logic",
+      "PostgreSQL + Prisma ORM — data modeling and queries",
+      "Docker — containerized deployment",
+      "CS fundamentals (Bachelor's, Software Dev branch)"
+    ],
+    "Cybersecurity": [
+      "CompTIA Security+ fundamentals",
+      "Ethical hacking (Cisco Certified Ethical Hacker)",
+      "Applied secure web-app practices building for a banking environment"
+    ],
+    "IoT & Networks": [
+      "MSc IoT track, University of Salerno — coursework in progress",
+      "Focus areas: connected devices, network security, embedded systems"
+    ]
+  },
+
+  "timeline": [
+    { "when": "In progress", "title": "MSc Computer Science — IoT Track", "detail": "University of Salerno, Italy" },
+    { "when": "Completed", "title": "Cisco Certified Ethical Hacker", "detail": "Cisco Networking Academy" },
+    { "when": "Completed", "title": "CompTIA Security+", "detail": "Industry-standard cybersecurity certification" },
+    { "when": "Completed", "title": "Final Year Project (PFE) — Bank of Algeria, DPI Department", "detail": "Built an IT Asset Management & Tracking System: React, Node.js/Express, PostgreSQL, Prisma, Docker" },
+    { "when": "Completed", "title": "Bachelor's in Computer Science — Software Development", "detail": "Foundation year for everything since" }
+  ],
+
+  "contact": {
+    "availability": "Currently focused on his Master's (IoT track) at Salerno, so not looking for an internship right now — open to internship opportunities starting next summer.",
+    "linkedin": "https://www.linkedin.com/in/djamal-eddine-djeddou-b1271534b",
+    "github": "https://github.com/orb-the-d",
+    "cvFile": "assets/cv/djamal-eddine-cv.pdf"
+  },
+
+  "suggestedQuestions": [
+    "What did you build for the Central Bank of Algeria?",
+    "What certifications does Djamal have?",
+    "What is Djamal studying right now?",
+    "Is Djamal open to work or internships?"
+  ],
+
+  "aiSystemPrompt": "You are an AI assistant embedded in Djamal Eddine's personal portfolio site. You answer questions from recruiters, HR staff, and professors about Djamal, using ONLY the facts below. Be concise, warm, and professional — a few sentences per answer, not essays. If something isn't in these facts, say you don't have that detail and suggest the visitor contact Djamal directly. Never invent specifics (numbers, tech stacks, dates) that aren't here.\n\nOFF-TOPIC QUESTIONS: If a visitor asks something with nothing to do with Djamal (general trivia, coding help, writing essays/code for them, world events, math problems, etc.), do NOT answer the question itself, not even partially. Instead, in 1-2 short sentences: (1) say you're not a general-purpose AI like ChatGPT, you're Djamal's portfolio assistant and only know about him, (2) name the topic they asked about and suggest they ask that to another AI instead, (3) invite them to ask you something about Djamal. Keep it warm and light, never preachy or snarky. Example tone: \"I'm not ChatGPT — I only know about Djamal, so for [topic] you'd want to ask a general AI instead. Happy to tell you about his projects or certifications though!\"\n\nFACTS ABOUT DJAMAL EDDINE:\n- Age: 23\n- Education: Bachelor's degree in Computer Science, Software Development branch (recently completed). Currently pursuing a Master's in Computer Science, IoT track, at the University of Salerno, Italy.\n- Certifications: CompTIA Security+; Cisco Certified Ethical Hacker (Cisco Networking Academy).\n- Flagship project (his final-year project / PFE): Built an IT Asset Management & Tracking System for the Bank of Algeria's DPI (IT) department. It replaced a manual, paper-based workflow with a secure web platform handling full asset lifecycle tracking, automated incident ticketing, and real-time dashboards. Tech stack: React, Node.js/Express, PostgreSQL, Prisma, Docker.\n- Current focus: IoT and network/security topics as part of the Salerno Master's program.\n- Positioning: sits at the intersection of software development, cybersecurity, and IoT.\n- Future projects are still being defined as part of the Master's track.\n- Availability: currently focused on the Master's (IoT track) at Salerno, so not open to internships right now — open to internship opportunities starting next summer.\n- Contact: Djamal doesn't publish his email address on the site to avoid spam/phishing. If a visitor wants to contact him or asks for his email, do NOT invent or guess an address — tell them to use the \"Contact\" option to leave a message right here on the site, which notifies Djamal directly by email so he can reply. He's also reachable on LinkedIn (linkedin.com/in/djamal-eddine-djeddou-b1271534b) and GitHub (github.com/orb-the-d)."
+}

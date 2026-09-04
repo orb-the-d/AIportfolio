@@ -1,0 +1,10 @@
+{
+  "name": "djamal-portfolio",
+  "version": "1.0.0",
+  "description": "AI-native portfolio for Djamal Eddine — software dev, cybersecurity, IoT",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  }
+}

@@ -1,0 +1,378 @@
+:root{
+  --bg:#ffffff;
+  --bg-soft:#f7f6f3;
+  --text:#16181d;
+  --muted:#6b7280;
+  --amber:#c97c1f;
+  --teal:#2f8f80;
+  --border:#e8e6e1;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Inter',sans-serif;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+h1{font-family:'Space Grotesk',sans-serif;}
+::selection{background:#ffe3b8;color:var(--text);}
+
+/* ---- fluid mouse-reactive background, fixed behind everything ---- */
+.fluid-canvas{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  z-index:0;
+  filter:saturate(65%) brightness(1.12) blur(0.5px); /* pulls the colors toward soft pastel instead of saturated neon */
+}
+
+/* ---- transparent top nav ---- */
+.topnav{
+  position:fixed;top:0;left:0;right:0;z-index:20;
+  padding:22px 28px;
+  display:flex;align-items:center;
+  pointer-events:none;
+}
+.brand{
+  font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px;color:var(--text);
+  pointer-events:auto;cursor:pointer;
+  padding:6px 10px;margin:-6px -10px;border-radius:10px;
+  transition:background .15s ease, opacity .15s ease;
+}
+.brand:hover{background:rgba(0,0,0,0.05);}
+.brand:active{opacity:.65;}
+
+/* ---- stage: the whole interactive layer sits above the canvas ---- */
+.stage{
+  position:relative;
+  z-index:1;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:120px 20px 48px;
+  pointer-events:none; /* let mouse pass through to canvas; re-enabled on real controls below */
+}
+.stage input,
+.stage button,
+.stage a{ pointer-events:auto; }
+
+/* ---- small pinned header, shown only in conversation mode: avatar only,
+   no name — bigger so it clearly reads as "you're talking to him" ---- */
+.chat-header{
+  position:fixed;top:54px;left:50%;
+  transform:translateX(-50%) translateY(-10px) scale(0.85);
+  opacity:0;
+  width:120px;height:120px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,0.7);
+  backdrop-filter:blur(16px) saturate(150%);
+  -webkit-backdrop-filter:blur(16px) saturate(150%);
+  border:1px solid var(--border);
+  border-radius:50%;
+  padding:5px;
+  z-index:15;
+  box-shadow:0 14px 34px rgba(0,0,0,0.12);
+  transition:opacity .35s ease, transform .35s ease, box-shadow .15s ease;
+  pointer-events:none;
+  cursor:pointer;
+}
+.chat-header-avatar{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;}
+.stage.started .chat-header{opacity:1;transform:translateX(-50%) translateY(0) scale(1);pointer-events:auto;}
+.stage.started .chat-header:hover{box-shadow:0 16px 40px rgba(0,0,0,0.18);}
+.stage.started .chat-header:active{transform:translateX(-50%) translateY(0) scale(0.94);}
+
+/* ---- landing block: greeting + headline + avatar, one clean stack ---- */
+.center-col{
+  display:flex;flex-direction:column;align-items:center;
+  gap:26px;
+  margin-bottom:44px;
+  text-align:center;
+  transition:opacity .4s ease, max-height .4s ease, margin .4s ease, transform .4s ease;
+  max-height:600px;
+  overflow:hidden;
+}
+.stage.started .center-col{
+  opacity:0;max-height:0;margin:0;transform:scale(0.96);
+  pointer-events:none;
+}
+
+.greeting{font-size:19px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:8px;}
+.wave{display:inline-block;animation:wave 2.4s ease-in-out infinite;transform-origin:70% 70%;}
+@keyframes wave{
+  0%,60%,100%{transform:rotate(0deg);}
+  10%{transform:rotate(14deg);}
+  20%{transform:rotate(-8deg);}
+  30%{transform:rotate(14deg);}
+  40%{transform:rotate(-4deg);}
+}
+.identity{
+  font-size:56px;font-weight:700;line-height:1.08;letter-spacing:-1px;
+}
+@media (max-width:600px){ .identity{font-size:38px;} }
+
+.avatar-wrap{
+  position:relative;
+  width:248px;height:248px;
+}
+@media (max-width:600px){
+  .avatar-wrap{width:200px;height:200px;}
+}
+.avatar-img{
+  width:100%;height:100%;border-radius:50%;object-fit:cover;
+  box-shadow:0 14px 44px rgba(0,0,0,0.14);
+  position:relative;z-index:2;
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1), opacity .18s ease;
+}
+.avatar-ring{
+  position:absolute;inset:-8px;border-radius:50%;
+  border:2px solid var(--teal);
+  opacity:0;z-index:1;
+}
+.avatar-wrap.idle .avatar-img{ animation:breathe 4.5s ease-in-out infinite; }
+@keyframes breathe{
+  0%,100%{transform:scale(1);}
+  50%{transform:scale(1.025);}
+}
+.avatar-wrap.thinking .avatar-ring{
+  opacity:1;
+  animation:spin 1.1s linear infinite, pulseRing 1.1s ease-in-out infinite;
+}
+@keyframes spin{ to{ transform:rotate(360deg); } }
+@keyframes pulseRing{
+  0%,100%{box-shadow:0 0 0 0 rgba(47,143,128,0.25);}
+  50%{box-shadow:0 0 0 8px rgba(47,143,128,0);}
+}
+.avatar-wrap.reacting .avatar-img{
+  animation:react .55s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes react{
+  0%{transform:scale(1) rotate(0deg);}
+  30%{transform:scale(1.08) rotate(-4deg);}
+  60%{transform:scale(0.98) rotate(3deg);}
+  100%{transform:scale(1) rotate(0deg);}
+}
+
+/* ---- conversation ---- */
+.conversation{
+  width:100%;max-width:680px;
+  flex:0 0 auto;max-height:0;overflow:hidden;
+  transition:max-height .5s ease;
+  pointer-events:auto;
+}
+.stage.started .conversation{
+  flex:1 1 auto;max-height:100%;overflow-y:auto;
+  padding:112px 4px 20px;
+}
+.messages{display:flex;flex-direction:column;gap:22px;}
+
+.msg-row{display:flex;flex-direction:column;gap:6px;}
+.msg-row.user{align-items:flex-end;}
+.msg-row.bot{align-items:flex-start;}
+
+.bubble-user{
+  background:var(--bg-soft);border:1px solid var(--border);
+  border-radius:14px 14px 4px 14px;
+  padding:10px 16px;font-size:15px;max-width:80%;
+  animation:popIn .3s ease;
+}
+.bubble-bot{max-width:92%;font-size:15.5px;animation:popIn .3s ease;}
+.bubble-bot p{margin-bottom:10px;opacity:0;transform:translateY(8px);animation:lineIn .45s ease forwards;}
+.bubble-bot p:last-child{margin-bottom:0;}
+@keyframes lineIn{ to{opacity:1;transform:translateY(0);} }
+@keyframes popIn{ from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+
+.typing-dots{display:inline-flex;gap:4px;padding:6px 0;}
+.typing-dots span{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:blink 1.2s infinite ease-in-out;}
+.typing-dots span:nth-child(2){animation-delay:.15s;}
+.typing-dots span:nth-child(3){animation-delay:.3s;}
+@keyframes blink{ 0%,80%,100%{opacity:0.25;} 40%{opacity:1;} }
+
+.contact-card{
+  border:1px solid var(--border);border-radius:14px;padding:16px;
+  display:flex;flex-direction:column;gap:10px;max-width:340px;
+  background:rgba(255,255,255,0.6);backdrop-filter:blur(12px);
+  animation:popIn .35s ease;
+}
+.contact-card a{
+  display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);
+  font-size:14.5px;padding:8px 10px;border-radius:8px;border:1px solid var(--border);
+  transition:border-color .15s, background .15s;
+}
+.contact-card a:hover{border-color:var(--teal);background:var(--bg-soft);}
+
+/* ---- composer: glassy input + glassy liquid-glass nav dock ---- */
+.composer{
+  position:relative;z-index:4;width:100%;max-width:680px;
+  display:flex;flex-direction:column;align-items:center;gap:18px;
+}
+
+/* ============================================================
+   .glass-wrap — shared "thick, warped ice / liquid glass" shell.
+   Layering (back to front):
+     1. ::before  — samples + WARPS whatever is behind it (the mouse-
+        reactive fluid canvas) via the SVG feTurbulence/feDisplacementMap
+        filter, then blurs/saturates it. This is the wavy glass distortion.
+     2. the real inner element (.input-row / .pill-row) — a translucent
+        white fill + its own gloss highlight, sitting on top of the warped
+        backdrop so distorted color still shows through it.
+     3. ::after   — a colored inset rim (red/magenta on one side, cyan/blue
+        on the other) along the curved border only, faking the RGB
+        channel-split / chromatic-aberration fringe you get on real thick
+        glass edges.
+   Both pseudo-layers are pointer-events:none so clicks always reach the
+   real buttons/input underneath.
+   ============================================================ */
+.glass-wrap{
+  position:relative;
+  border-radius:100px;
+  isolation:isolate;
+}
+.glass-wrap::before{
+  content:"";
+  position:absolute;inset:0;
+  border-radius:inherit;
+  backdrop-filter:url(#glass-distortion) blur(6px) saturate(260%);
+  -webkit-backdrop-filter:blur(6px) saturate(260%);
+  pointer-events:none;
+  z-index:0;
+}
+.glass-wrap::after{
+  content:"";
+  position:absolute;inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  z-index:3;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.65),
+    inset 3px 3px 5px rgba(255,45,120,0.55),
+    inset -3px -3px 5px rgba(45,170,255,0.55),
+    inset 0 -3px 9px rgba(255,255,255,0.45);
+}
+
+.input-glass-wrap{ width:100%; }
+
+.input-row{
+  position:relative;z-index:1;
+  width:100%;display:flex;gap:8px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.32) 50%, rgba(255,255,255,0.52) 100%);
+  border:1px solid rgba(255,255,255,0.85);
+  border-radius:100px;
+  padding:6px 6px 6px 22px;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.9) inset,
+    0 -8px 16px rgba(255,255,255,0.4) inset,
+    0 10px 40px rgba(0,0,0,0.08);
+  overflow:hidden;
+}
+.input-row::before{
+  content:"";
+  position:absolute;top:2px;left:8%;right:8%;
+  height:42%;
+  border-radius:100px 100px 50% 50%/100px 100px 20px 20px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0));
+  opacity:.8;
+  pointer-events:none;
+}
+.input-row input, .input-row button{ position:relative; z-index:1; }
+.input-row input{
+  flex:1;border:none;outline:none;background:transparent;
+  font-size:15px;font-family:inherit;color:var(--text);
+}
+.input-row input::placeholder{color:var(--muted);}
+.input-row button{
+  width:38px;height:38px;border-radius:50%;border:none;
+  background:var(--text);color:#fff;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .12s ease, background .15s ease;
+  flex-shrink:0;
+}
+.input-row button:hover{background:var(--amber);}
+.input-row button:active{transform:scale(0.92);}
+.input-row button:disabled{opacity:0.4;cursor:not-allowed;}
+
+/* ---- bottom nav dock: floating rounded-rect, high-refraction liquid glass ----
+   Radius matches the interior pill buttons (22px) instead of a full pill/
+   capsule shape, so the outer dock and inner buttons read as one family. */
+.dock-glass-wrap{ border-radius:28px; }
+
+.pill-row{
+  position:relative;z-index:1;
+  display:flex;flex-wrap:nowrap;justify-content:center;
+  gap:2px;
+  padding:9px 12px;
+  border-radius:28px;
+  isolation:isolate;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.62) 0%, rgba(255,255,255,0.14) 45%, rgba(255,255,255,0.4) 100%);
+  border:1px solid rgba(255,255,255,0.9);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,1) inset,
+    0 -14px 24px rgba(255,255,255,0.55) inset,
+    0 1px 3px rgba(255,255,255,0.7),
+    0 26px 56px rgba(31,41,55,0.22),
+    0 4px 14px rgba(31,41,55,0.14);
+  overflow:hidden;
+  transition:transform .2s ease, box-shadow .2s ease;
+}
+/* glossy specular streak across the top, like light on a glass bubble */
+.pill-row::before{
+  content:"";
+  position:absolute;top:3px;left:6%;right:6%;
+  height:44%;
+  border-radius:28px 28px 50% 50%/28px 28px 20px 20px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0));
+  opacity:.85;
+  pointer-events:none;
+  z-index:1;
+}
+/* soft rainbow-tinted inner rim to sell the "ice" refraction — more
+   saturated + wider spread than before for a stronger liquid-glass look */
+.pill-row::after{
+  content:"";
+  position:absolute;inset:0;
+  border-radius:28px;
+  padding:1.5px;
+  background:linear-gradient(120deg, rgba(255,255,255,0.95), rgba(140,200,255,0.55) 30%, rgba(255,255,255,0.15) 50%, rgba(255,170,220,0.5) 75%, rgba(255,255,255,0.95));
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  pointer-events:none;
+  z-index:1;
+  opacity:.9;
+}
+
+.pill{
+  position:relative;z-index:2;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  width:76px;height:70px;
+  border-radius:22px;
+  border:none;
+  background:transparent;
+  cursor:pointer;
+  box-shadow:none;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1), background .15s ease, box-shadow .15s ease;
+}
+.pill:hover{
+  transform:translateY(-5px) scale(1.04);
+  background:rgba(255,255,255,0.5);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.9) inset,
+    0 10px 22px rgba(31,41,55,0.10);
+}
+.pill:active{ transform:translateY(-1px) scale(0.98); }
+.pill-icon{width:25px;height:25px;object-fit:contain;line-height:1;filter:drop-shadow(0 2px 2px rgba(0,0,0,0.12));}
+.pill-label{font-size:12.5px;font-weight:500;color:var(--text);}
+
+@media (max-width:600px){
+  .pill{width:60px;height:62px;border-radius:18px;}
+  .pill-icon{width:21px;height:21px;}
+  .pill-label{font-size:10.5px;}
+  .pill-row{padding:7px 8px;gap:0;border-radius:22px;}
+  .dock-glass-wrap{border-radius:22px;}
+}
