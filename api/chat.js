@@ -13,11 +13,12 @@
 //    runtime version Vercel builds with; on some runtimes that syntax fails to
 //    parse and the whole function 500s before it ever calls the AI. Reading the
 //    file at runtime works everywhere and needs no special syntax.
-//  - The model id is "gemini-2.0-flash" — a stable, non-preview model that's
-//    part of Gemini's free tier with generous limits (15 requests/min,
-//    1,500 requests/day as of writing). Preview models move in and out of
-//    the free tier without notice, so a stable model is the safer default
-//    here; swap it for whatever's current if you want a newer one.
+//  - The model id is "gemini-3.6-flash" — the current generally-available
+//    Flash model as of Sept 2026. Google retires older model ids over time
+//    (this file used to point at gemini-2.0-flash, which stopped working),
+//    so if this starts 404ing again in the future, check
+//    https://ai.google.dev/gemini-api/docs/models for whatever the current
+//    stable Flash model id is and swap it in here.
 //  - If GEMINI_API_KEY isn't set in Vercel's environment variables, this now
 //    says so explicitly instead of returning a generic failure.
 
@@ -30,7 +31,7 @@ const bio = JSON.parse(
   readFileSync(path.join(__dirname, '../assets/data/bio.json'), 'utf-8')
 );
 
-const MODEL = 'gemini-2.0-flash';
+const MODEL = 'gemini-3.6-flash';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
