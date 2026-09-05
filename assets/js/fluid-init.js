@@ -5,24 +5,7 @@
 // everywhere else stays the page's white background, and the color bleeds through
 // the blurred glass panels (nav pills, chat input) that sit on top of it.
 
-(function initFluid() {
-  const canvas = document.getElementById('fluidCanvas');
-  if (!canvas) {
-    console.error('Fluid background: #fluidCanvas not found in the page.');
-    return;
-  }
-  if (typeof WebGLFluid === 'undefined') {
-    console.error('Fluid background: the webgl-fluid library did not load (check the <script> tag / network).');
-    return;
-  }
-
-  function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
-  resizeCanvas();
-  window.addEventListener('resize', resizeCanvas);
-
+(function initFluidController() {
   const FLUID_CONFIG = {
     TRIGGER: 'hover',        // reacts continuously as the mouse moves, not just on click
     IMMEDIATE: false,        // stay blank until the visitor actually moves their mouse
@@ -42,66 +25,65 @@
     SUNRAYS: false,
   };
 
-  function startFluid() {
+  let canvas = document.getElementById('fluidCanvas');
+  if (!canvas) {
+    console.error('Fluid background: #fluidCanvas not found in the page.');
+    return;
+  }
+  if (typeof WebGLFluid === 'undefined') {
+    console.error('Fluid background: the webgl-fluid library did not load (check the <script> tag / network).');
+    return;
+  }
+
+  // Rebuilding the canvas element (rather than resizing/reusing a live one) is what
+  // makes this safe to call repeatedly: it guarantees a brand new WebGL context with
+  // no stale framebuffers left over from the previous run. Mutating canvas.width /
+  // canvas.height on an already-running simulation is what was causing the freeze —
+  // the library's internal buffers stayed sized for the old dimensions for one frame,
+  // producing NaNs in the velocity field that never dissipate (hence the screen
+  // "throwing color" and then freezing solid on that garbage frame).
+  function rebuildFluid() {
+    const parent = canvas.parentNode;
+    const fresh = document.createElement('canvas');
+    fresh.id = 'fluidCanvas';
+    fresh.className = 'fluid-canvas';
+    parent.replaceChild(fresh, canvas);
+    canvas = fresh;
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
     try {
       WebGLFluid(canvas, FLUID_CONFIG);
     } catch (err) {
       console.error('Fluid background: WebGLFluid() threw during init:', err);
+      return;
     }
-  }
-  startFluid();
 
-  // ---- recover automatically if the GPU drops the WebGL context ----
-  canvas.addEventListener('webglcontextlost', (e) => {
-    console.warn('Fluid background: WebGL context lost, will restore automatically.');
-    e.preventDefault();
-  }, false);
-  canvas.addEventListener('webglcontextrestored', () => {
-    console.warn('Fluid background: WebGL context restored, restarting simulation.');
-    startFluid();
-  }, false);
-
-  // ---- keep the fluid alive under the glass UI ----
-  // WebGLFluid only listens for mouse/touch events on `canvas` itself. Once
-  // the nav dock / input pill sit on top with pointer-events:auto, the browser
-  // delivers real cursor events to *them*, not to the canvas underneath — so
-  // the fluid would freeze under any glass panel the cursor is over. Fix:
-  // listen globally and re-dispatch a synthetic copy of every pointer event
-  // straight at the canvas.
-  //
-  // Throttled to roughly one dispatch per 16ms (~60fps) using a plain
-  // timestamp check — simpler and more robust than an animation-frame queue,
-  // and still cuts GPU load a lot versus forwarding every raw input event
-  // (some trackpads report 120-240 moves/sec).
-  let lastForwardTime = 0;
-
-  function forwardToCanvas(type, srcEvent) {
-    const evt = new MouseEvent(type, {
-      clientX: srcEvent.clientX,
-      clientY: srcEvent.clientY,
-      button: srcEvent.button || 0,
-      bubbles: true,
-      cancelable: true,
-      view: window,
-    });
-    canvas.dispatchEvent(evt);
+    canvas.addEventListener('webglcontextlost', (e) => {
+      console.warn('Fluid background: WebGL context lost, rebuilding.');
+      e.preventDefault();
+      rebuildFluid();
+    }, false);
   }
 
-  window.addEventListener('pointermove', (e) => {
-    if (e.target === canvas) return;       // canvas already got the real event
-    if (e.pointerType === 'touch') return; // avoid double-handling touch
-    const now = performance.now();
-    if (now - lastForwardTime < 16) return;
-    lastForwardTime = now;
-    forwardToCanvas('mousemove', e);
-  }, { passive: true });
+  rebuildFluid();
 
-  ['pointerdown', 'pointerup'].forEach((pointerType) => {
-    const mapped = pointerType === 'pointerdown' ? 'mousedown' : 'mouseup';
-    window.addEventListener(pointerType, (e) => {
-      if (e.target === canvas) return;
-      if (e.pointerType === 'touch') return;
-      forwardToCanvas(mapped, e);
-    }, { passive: true });
+  // Resizing safely: rebuild from scratch, but debounced so dragging a window
+  // edge doesn't tear down/recreate the WebGL context dozens of times a second.
+  let resizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(rebuildFluid, 300);
+  });
+
+  // Switching tabs/apps and coming back is the other classic trigger for this kind
+  // of simulation to explode: the library's next animation frame sees a huge elapsed
+  // time (however long the tab was hidden) and produces the same NaN-explosion
+  // symptom. Rebuilding on return sidesteps it entirely.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      rebuildFluid();
+    }
   });
 })();
