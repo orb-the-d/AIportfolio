@@ -11,15 +11,15 @@
     IMMEDIATE: false,        // stay blank until the visitor actually moves their mouse
     SIM_RESOLUTION: 128,
     DYE_RESOLUTION: 720,
-    DENSITY_DISSIPATION: 3.2,
-    VELOCITY_DISSIPATION: 2.4,
-    PRESSURE: 0.92,
-    CURL: 5,
-    SPLAT_RADIUS: 0.36,
-    SPLAT_FORCE: 3600,
-    SHADING: false,
+    DENSITY_DISSIPATION: 2.6, // slower fade so trails actually blend into each other
+    VELOCITY_DISSIPATION: 1.8,
+    PRESSURE: 0.8,
+    CURL: 16,                 // higher = the swirly "mixing paint" turbulence, not flat blobs
+    SPLAT_RADIUS: 0.22,        // smaller drops read as a flowing streak, not separate dots
+    SPLAT_FORCE: 4200,
+    SHADING: true,             // adds light/depth so it looks like fluid, not flat color
     COLORFUL: true,
-    COLOR_UPDATE_SPEED: 1.6,
+    COLOR_UPDATE_SPEED: 5,
     TRANSPARENT: true,
     BLOOM: false,
     SUNRAYS: false,
