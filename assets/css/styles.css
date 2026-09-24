@@ -58,12 +58,10 @@ h1{font-family:'Space Grotesk',sans-serif;}
                          caused the avatar to render "half shown" with no
                          way to scroll down to see the rest of it. */
   overflow-x:hidden;
-  justify-content:safe center; /* if it does overflow, keep the TOP of the
-                         content reachable by scrolling up, instead of a
-                         plain "center" clipping the start of it off */
   display:flex;
   flex-direction:column;
   align-items:center;
+  justify-content:center;
   padding:120px 20px 48px;
   pointer-events:none; /* let mouse pass through to canvas; re-enabled on real controls below */
 }
@@ -106,30 +104,28 @@ h1{font-family:'Space Grotesk',sans-serif;}
 .stage.started .chat-header:active{transform:translateX(-50%) translateY(0) scale(0.94);}
 
 /* ---- landing block: greeting + headline + avatar, one clean stack ----
-   Uses the CSS grid-template-rows "1fr -> 0fr" trick to collapse this block
-   when a chat starts, instead of guessing a pixel max-height for the
-   expanded state. A guessed number (previously 600px, then 900px) kept
-   clipping a sliver off the bottom of the avatar on some screens/font
-   renders — this technique sizes to the content's REAL height automatically
-   in the resting (1fr) state, so nothing can ever be clipped there; it only
-   constrains height while collapsing toward the chat state (0fr). */
+   Back to a plain flex column with a generous fixed max-height for the
+   collapse transition. (A CSS grid-based "auto height" trick was tried here
+   instead, to avoid guessing a pixel number — but it broke the chat layout
+   once a conversation started, which is a worse problem than the one it was
+   solving. Reverted. .center-col-inner from that attempt is kept in the
+   HTML but neutralized below with display:contents, so no HTML edit is
+   needed to undo this.) 900px is comfortably larger than the real content
+   (greeting + 2-line heading + 224px avatar) on every screen size this
+   layout supports, and the .stage overflow-y:auto fall back above already
+   covers the rare case where it's not enough. */
 .center-col{
-  width:100%;
-  display:grid;
-  grid-template-rows:1fr;
-  margin-bottom:44px;
-  text-align:center;
-  transition:grid-template-rows .4s ease, opacity .4s ease, margin .4s ease, transform .4s ease;
-}
-.center-col-inner{
   display:flex;flex-direction:column;align-items:center;
   gap:22px;
-  min-height:0; /* required for the parent's 0fr row to actually clip this on collapse */
+  margin-bottom:44px;
+  text-align:center;
+  transition:opacity .4s ease, max-height .4s ease, margin .4s ease, transform .4s ease;
+  max-height:900px;
   overflow:hidden;
 }
+.center-col-inner{ display:contents; } /* neutralizes the wrapper div from the reverted grid attempt */
 .stage.started .center-col{
-  grid-template-rows:0fr;
-  opacity:0;margin:0;transform:scale(0.96);
+  opacity:0;max-height:0;margin:0;transform:scale(0.96);
   pointer-events:none;
 }
 
@@ -149,8 +145,7 @@ h1{font-family:'Space Grotesk',sans-serif;}
 @media (max-height:700px){
   .identity{font-size:40px;}
   .avatar-wrap{width:180px;height:180px;}
-  .center-col{margin-bottom:24px;}
-  .center-col-inner{gap:16px;}
+  .center-col{margin-bottom:24px;gap:16px;}
   .stage{padding-top:90px;}
 }
 
