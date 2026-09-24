@@ -28,22 +28,23 @@
     IMMEDIATE: false,        // stay blank until the visitor actually moves their mouse
     SIM_RESOLUTION: 128,
     DYE_RESOLUTION: 720,
-    DENSITY_DISSIPATION: 2.6,  // lingers a bit longer than before — now that the event-flood
-                               // and brightness-filter causes of the old whiteout bug are both
-                               // fixed, we can afford a slower fade for a more liquid, less
-                               // "puff of smoke that vanishes instantly" feel
-    VELOCITY_DISSIPATION: 2.6, // thick, heavy resistance to motion
-    PRESSURE: 0.97,            // near-incompressible — real liquids barely compress; gas does
-    CURL: 2,                   // very low = one or two big coherent liquid blobs, not lots of
-                                // small chaotic wisps curling off — this is what reads as
-                                // "smoke" at higher values and "liquid" at low ones
-    SPLAT_RADIUS: 0.4,         // a fuller, heavier drop rather than a thin trail
-    SPLAT_FORCE: 4200,
-    SHADING: false,           // flat color, no fake 3D lighting — that lighting was the harsh neon-glow look
+    DENSITY_DISSIPATION: 3.2,
+    VELOCITY_DISSIPATION: 2.4,
+    PRESSURE: 0.92,
+    CURL: 5,                   // NOTE: this was pushed down to 2 for an even more
+                                // "liquid" look, but that's the one thing that changed
+                                // right before the effect stopped showing at all — reverted
+                                // to this last-confirmed-working value. If you want to try
+                                // lower curl again for a more liquid feel, change ONLY this
+                                // number, redeploy, and check it still renders before
+                                // changing anything else.
+    SPLAT_RADIUS: 0.36,
+    SPLAT_FORCE: 3600,
+    SHADING: false,
     COLORFUL: true,
-    COLOR_UPDATE_SPEED: 1.4,  // slow, steady hue drift like dye actually diffusing through water
+    COLOR_UPDATE_SPEED: 1.6,
     TRANSPARENT: true,
-    BLOOM: false,             // bloom was the main source of the too-bright glow — off
+    BLOOM: false,
     SUNRAYS: false,
   };
 

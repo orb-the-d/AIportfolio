@@ -50,23 +50,31 @@ h1{font-family:'Space Grotesk',sans-serif;}
 .stage{
   position:relative;
   z-index:1;
-  height:100vh;      /* was min-height — that let the whole PAGE grow taller
-                         than the viewport as messages piled up, instead of
-                         the inner .conversation panel becoming its own
-                         scrollable box. That's the real reason auto-scroll
-                         wasn't working: our JS was correctly scrolling
-                         #conversation to its bottom, but #conversation never
-                         actually overflowed internally — the whole page did,
-                         and nothing was telling the *page* to scroll down. */
-  overflow:hidden;   /* the page itself no longer scrolls; #conversation
-                         (see .stage.started .conversation below) is now the
-                         one true scrollable area once a chat starts. */
+  height:100vh;
+  overflow-y:auto;   /* landing state: if the greeting + heading + avatar are
+                         taller than a short viewport (e.g. DevTools open,
+                         eating half the screen), the page can still scroll
+                         to reach all of it — this is what was missing and
+                         caused the avatar to render "half shown" with no
+                         way to scroll down to see the rest of it. */
+  overflow-x:hidden;
+  justify-content:safe center; /* if it does overflow, keep the TOP of the
+                         content reachable by scrolling up, instead of a
+                         plain "center" clipping the start of it off */
   display:flex;
   flex-direction:column;
   align-items:center;
-  justify-content:center;
   padding:120px 20px 48px;
   pointer-events:none; /* let mouse pass through to canvas; re-enabled on real controls below */
+}
+.stage.started{
+  overflow:hidden;   /* once a chat starts, lock the outer page so ONLY
+                         #conversation scrolls internally (see
+                         .stage.started .conversation below) — this is what
+                         makes auto-scroll-to-bottom work, instead of the
+                         whole page growing taller than the viewport as
+                         messages pile up. Landing state above doesn't need
+                         this lock since there's no growing message list yet. */
 }
 .stage input,
 .stage button,
@@ -125,6 +133,12 @@ h1{font-family:'Space Grotesk',sans-serif;}
   font-size:56px;font-weight:700;line-height:1.08;letter-spacing:-1px;
 }
 @media (max-width:600px){ .identity{font-size:38px;} }
+@media (max-height:700px){
+  .identity{font-size:40px;}
+  .avatar-wrap{width:180px;height:180px;}
+  .center-col{gap:16px;margin-bottom:24px;}
+  .stage{padding-top:90px;}
+}
 
 .avatar-wrap{
   position:relative;
