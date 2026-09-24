@@ -25,7 +25,11 @@ h1{font-family:'Space Grotesk',sans-serif;}
   position:fixed;
   inset:0;
   width:100vw;
-  height:100vh;
+  height:100vh;   /* fallback for browsers without dvh support */
+  height:100dvh;  /* real visible height on mobile — 100vh includes the area
+                     behind the browser's address bar, which shows/hides as
+                     you scroll, leaving a gap or overflow; dvh tracks the
+                     actual visible viewport instead */
   z-index:0;
   filter:saturate(82%) contrast(1.04); /* keeps real color instead of washing to pastel/white */
 }
@@ -33,7 +37,7 @@ h1{font-family:'Space Grotesk',sans-serif;}
 /* ---- transparent top nav ---- */
 .topnav{
   position:fixed;top:0;left:0;right:0;z-index:20;
-  padding:22px 28px;
+  padding:calc(22px + env(safe-area-inset-top)) calc(28px + env(safe-area-inset-right)) 22px calc(28px + env(safe-area-inset-left));
   display:flex;align-items:center;
   pointer-events:none;
 }
@@ -50,7 +54,9 @@ h1{font-family:'Space Grotesk',sans-serif;}
 .stage{
   position:relative;
   z-index:1;
-  height:100vh;
+  height:100vh;   /* fallback for browsers without dvh support */
+  height:100dvh;  /* tracks the real visible viewport on mobile, not the
+                     address-bar-inclusive one — see .fluid-canvas above */
   overflow-y:auto;   /* landing state: if the greeting + heading + avatar are
                          taller than a short viewport (e.g. DevTools open,
                          eating half the screen), the page can still scroll
@@ -62,7 +68,10 @@ h1{font-family:'Space Grotesk',sans-serif;}
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  padding:120px 20px 48px;
+  padding:calc(120px + env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) calc(48px + env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+  /* the env() additions keep content clear of a phone's notch/dynamic
+     island up top and the home-indicator gesture bar down below, instead
+     of the fixed nav / chat input sitting underneath them */
   pointer-events:none; /* let mouse pass through to canvas; re-enabled on real controls below */
 }
 .stage.started{
@@ -81,7 +90,7 @@ h1{font-family:'Space Grotesk',sans-serif;}
 /* ---- small pinned header, shown only in conversation mode: avatar only,
    no name — bigger so it clearly reads as "you're talking to him" ---- */
 .chat-header{
-  position:fixed;top:54px;left:50%;
+  position:fixed;top:calc(54px + env(safe-area-inset-top));left:50%;
   transform:translateX(-50%) translateY(-10px) scale(0.85);
   opacity:0;
   width:120px;height:120px;
@@ -147,7 +156,7 @@ h1{font-family:'Space Grotesk',sans-serif;}
 @media (max-width:600px){ .identity{font-size:clamp(26px, 6vh, 38px);} }
 @media (max-height:700px){
   .center-col{margin-bottom:24px;gap:16px;}
-  .stage{padding-top:90px;}
+  .stage{padding-top:calc(90px + env(safe-area-inset-top));}
 }
 
 .avatar-wrap{
