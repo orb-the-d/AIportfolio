@@ -139,12 +139,13 @@ h1{font-family:'Space Grotesk',sans-serif;}
   40%{transform:rotate(-4deg);}
 }
 .identity{
-  font-size:56px;font-weight:700;line-height:1.08;letter-spacing:-1px;
+  font-size:clamp(30px, 6vh, 56px); /* shrinks smoothly on shorter screens
+    instead of the avatar being the thing that runs out of room — the
+    avatar keeps its full size always; this is what gives ground first. */
+  font-weight:700;line-height:1.08;letter-spacing:-1px;
 }
-@media (max-width:600px){ .identity{font-size:38px;} }
+@media (max-width:600px){ .identity{font-size:clamp(26px, 6vh, 38px);} }
 @media (max-height:700px){
-  .identity{font-size:40px;}
-  .avatar-wrap{width:180px;height:180px;}
   .center-col{margin-bottom:24px;gap:16px;}
   .stage{padding-top:90px;}
 }
