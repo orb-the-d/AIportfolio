@@ -260,8 +260,8 @@ function localAnswer(question) {
     const alt = bits.length ? ` He's also on ${bits.join(' and ')}.` : '';
     return `Djamal doesn't list his email publicly to avoid spam — use the Contact option below to leave him a message and he'll get notified right away.${alt}`;
   }
-  if (/who|about yourself|yourself|tell me about/.test(q)) {
-    return `${p.lead || p.tagline || "Djamal is a software developer working across cybersecurity and IoT."}`;
+  if (/who|about yourself|yourself|tell me about|\bname\b/.test(q)) {
+    return `I'm ${p.name || "Djamal Eddine"}'s virtual portfolio assistant. ${p.lead || p.tagline || "Djamal is a software developer working across cybersecurity and IoT."}`;
   }
   return `${p.tagline || "Djamal builds and secures systems — from bank IT platforms to connected devices."} Try asking about his projects, skills, or certifications.`;
 }
@@ -285,18 +285,32 @@ async function ask(question) {
     });
 
     if (response.status === 404) {
-      // No serverless function behind this host — answer locally instead
-      // of showing an error.
+      // No serverless function behind this host at all — answer locally
+      // instead of showing an error.
       revealBotText(bubble, localAnswer(question), false);
       return;
     }
 
-    const data = await response.json();
-    const answer = data.answer || "Sorry, I couldn't generate a response just now.";
-    const isJoke = /not chatgpt|ha!|😄|😂|joke/i.test(answer);
-    revealBotText(bubble, answer, isJoke);
+    const data = await response.json().catch(() => ({}));
+
+    // Any real failure — missing API key, every model in the fallback chain
+    // failed, malformed response, whatever — comes back with an `error`
+    // field and no `answer`. Rather than showing the visitor a "something
+    // went wrong" message, fall back to answering locally from bio.json so
+    // they always get a correct, on-topic answer about Djamal even during
+    // an AI-provider outage. They never see a broken experience; at worst
+    // the answer is a little less conversational than the real AI's.
+    if (!response.ok || data.error || !data.answer) {
+      if (data.error) console.warn('/api/chat failed, using local fallback:', data.error);
+      revealBotText(bubble, localAnswer(question), false);
+      return;
+    }
+
+    const isJoke = /not chatgpt|ha!|😄|😂|joke/i.test(data.answer);
+    revealBotText(bubble, data.answer, isJoke);
   } catch (err) {
-    // fetch() itself threw — e.g. opened via file:// with no server at all.
+    // fetch() itself threw — e.g. opened via file:// with no server at all,
+    // or a network drop.
     revealBotText(bubble, localAnswer(question), false);
   } finally {
     sendBtn.disabled = false;

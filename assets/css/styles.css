@@ -50,7 +50,17 @@ h1{font-family:'Space Grotesk',sans-serif;}
 .stage{
   position:relative;
   z-index:1;
-  min-height:100vh;
+  height:100vh;      /* was min-height — that let the whole PAGE grow taller
+                         than the viewport as messages piled up, instead of
+                         the inner .conversation panel becoming its own
+                         scrollable box. That's the real reason auto-scroll
+                         wasn't working: our JS was correctly scrolling
+                         #conversation to its bottom, but #conversation never
+                         actually overflowed internally — the whole page did,
+                         and nothing was telling the *page* to scroll down. */
+  overflow:hidden;   /* the page itself no longer scrolls; #conversation
+                         (see .stage.started .conversation below) is now the
+                         one true scrollable area once a chat starts. */
   display:flex;
   flex-direction:column;
   align-items:center;
