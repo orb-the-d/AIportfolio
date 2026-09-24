@@ -16,6 +16,30 @@
     return;
   }
 
+  // ---- block the library's built-in "press SPACE for a giant rainbow burst" demo feature ----
+  // The webgl-fluid library itself (not our code) binds a keydown listener
+  // for the spacebar that fires a huge multi-splat burst — a leftover demo
+  // feature from the original library, not something we asked for. Besides
+  // being an unwanted surprise for visitors, a big burst like that is exactly
+  // the kind of heavy one-shot GPU spike that risks the same context-loss
+  // freeze we already fixed once. Registering our own listener in the
+  // *capture* phase means it runs before the library's own (bubble-phase)
+  // listener ever sees the event, so we can stop it outright — except while
+  // the visitor is actually typing in the chat input, where spacebar must
+  // keep working normally.
+  window.addEventListener('keydown', (e) => {
+    if (e.code !== 'Space' && e.key !== ' ') return;
+    const active = document.activeElement;
+    const isTyping = active && (
+      active.tagName === 'INPUT' ||
+      active.tagName === 'TEXTAREA' ||
+      active.isContentEditable
+    );
+    if (isTyping) return; // let normal typing/space work
+    e.preventDefault();
+    e.stopImmediatePropagation();
+  }, true); // true = capture phase, runs first
+
   function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
