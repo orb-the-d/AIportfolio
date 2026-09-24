@@ -112,7 +112,15 @@ h1{font-family:'Space Grotesk',sans-serif;}
   margin-bottom:44px;
   text-align:center;
   transition:opacity .4s ease, max-height .4s ease, margin .4s ease, transform .4s ease;
-  max-height:600px;
+  max-height:900px; /* was 600px — genuinely too tight for the real content
+                        (greeting + 2-line heading + 248px avatar), so it was
+                        slicing a hard rectangular sliver off the bottom of
+                        the avatar before the avatar's own circular
+                        border-radius ever got to round that edge off. That
+                        sliver showing the raw square photo's background is
+                        exactly what looked like a "grey background" glitch.
+                        900px is comfortably larger than the real content on
+                        every screen size this layout supports. */
   overflow:hidden;
 }
 .stage.started .center-col{
